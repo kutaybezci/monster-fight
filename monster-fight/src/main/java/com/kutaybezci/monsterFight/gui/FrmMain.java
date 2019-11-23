@@ -3,18 +3,21 @@ package com.kutaybezci.monsterFight.gui;
 import com.kutaybezci.monsterFight.Monster;
 import com.kutaybezci.monsterFight.Session;
 import com.kutaybezci.monsterFight.Translate;
+import com.kutaybezci.monsterFight.Utils;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.ObjectInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -45,6 +48,7 @@ public class FrmMain extends javax.swing.JFrame {
         btnFight = new javax.swing.JButton();
         btnAbout = new javax.swing.JButton();
         btnSoundOff = new javax.swing.JToggleButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -71,6 +75,11 @@ public class FrmMain extends javax.swing.JFrame {
         });
 
         btnFight.setText("btnFight");
+        btnFight.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFightActionPerformed(evt);
+            }
+        });
 
         btnAbout.setText("btnAbout");
         btnAbout.addActionListener(new java.awt.event.ActionListener() {
@@ -86,6 +95,8 @@ public class FrmMain extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/monster.png"))); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -100,17 +111,22 @@ public class FrmMain extends javax.swing.JFrame {
                     .addComponent(btnAbout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnSoundOff, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(62, 62, 62))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(6, 6, 6)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnHeroName)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnFight)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnEditMonster)
-                .addGap(4, 4, 4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnNewMonster)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnAbout)
@@ -124,34 +140,43 @@ public class FrmMain extends javax.swing.JFrame {
 
     private void btnEditMonsterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditMonsterActionPerformed
         try {
-            JFileChooser fileChooser = new JFileChooser("monsters");
-            fileChooser.setDialogTitle(Translate.getInstance().translate("titleChooseMonster"));
-            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                File file = fileChooser.getSelectedFile();
-                byte[] encoded = Files.readAllBytes(Paths.get(file.getPath()));
-                encoded = Base64.getDecoder().decode(encoded);
-                try (ByteArrayInputStream bis = new ByteArrayInputStream(encoded);
-                        ObjectInputStream os = new ObjectInputStream(bis)) {
-                    Monster monster = (Monster) os.readObject();
-                    Translate translate = Translate.getInstance();
-                    String password = JOptionPane.showInputDialog(this, translate.translateFormat("magMonsterPassword", monster.getName()), translate.translate("titleMonsterPassword"), JOptionPane.OK_CANCEL_OPTION);
-                    if (!StringUtils.equals(password, monster.getPassword())) {
-                        JOptionPane.showMessageDialog(this, translate.translate("magMonsterPasswordNotMatch"), translate.translate("titleError"), JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    new FrmMonsterEditor(monster).setVisible(true);
-                }
+            Monster monster = chooseMonster();
+            if (monster == null) {
+                return;
             }
+            Translate translate = Translate.getInstance();
+            String password = JOptionPane.showInputDialog(this, translate.translateFormat("magMonsterPassword", monster.getName()), translate.translate("titleMonsterPassword"), JOptionPane.OK_CANCEL_OPTION);
+            if (!Utils.equals(password, monster.getPassword())) {
+                JOptionPane.showMessageDialog(this, translate.translate("magMonsterPasswordNotMatch"), translate.translate("titleError"), JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            new FrmMonsterEditor(monster).setVisible(true);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage());
         }
     }//GEN-LAST:event_btnEditMonsterActionPerformed
 
+    private Monster chooseMonster() throws Exception {
+        JFileChooser fileChooser = new JFileChooser("monsters");
+        fileChooser.setDialogTitle(Translate.getInstance().translate("titleChooseMonster"));
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            byte[] encoded = Files.readAllBytes(Paths.get(file.getPath()));
+            encoded = Base64.getDecoder().decode(encoded);
+            try (ByteArrayInputStream bis = new ByteArrayInputStream(encoded);
+                    ObjectInputStream os = new ObjectInputStream(bis)) {
+                return (Monster) os.readObject();
+            }
+        }
+        return null;
+    }
+
+
     private void btnHeroNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHeroNameActionPerformed
         Translate translate = Translate.getInstance();
         String name = JOptionPane.showInputDialog(this, translate.translate("msgNameInput"), translate.translate("titleNameInput"), JOptionPane.INFORMATION_MESSAGE);
-        if (!StringUtils.isBlank(name)) {
+        if (!Utils.isBlank(name)) {
             Session session = Session.getInstance();
             session.setPlayerName(name);
             this.btnHeroName.setText(session.getPlayerName());
@@ -171,6 +196,18 @@ public class FrmMain extends javax.swing.JFrame {
     private void btnSoundOffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSoundOffActionPerformed
         Session.getInstance().setSilent(this.btnSoundOff.isSelected());
     }//GEN-LAST:event_btnSoundOffActionPerformed
+
+    private void btnFightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFightActionPerformed
+        try {
+            Monster monster = chooseMonster();
+            if (monster == null) {
+                return;
+            }
+            new FrmFight(monster).setVisible(true);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage());
+        }
+    }//GEN-LAST:event_btnFightActionPerformed
 
     /**
      * @param args the command line arguments
@@ -219,5 +256,6 @@ public class FrmMain extends javax.swing.JFrame {
     private javax.swing.JButton btnHeroName;
     private javax.swing.JButton btnNewMonster;
     private javax.swing.JToggleButton btnSoundOff;
+    private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 }

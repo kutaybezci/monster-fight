@@ -41,6 +41,7 @@ public class FrmMonsterEditor extends javax.swing.JFrame {
         this.txtPassword.setText(this.monster.getPassword());
         this.txtPlayerHealth.setText(String.valueOf(this.monster.getPlayerHealth()));
         this.txtSecretMessage.setText(this.monster.getSecretMessage());
+        this.refreshTable();
     }
 
     public void setMonster() {
@@ -64,7 +65,7 @@ public class FrmMonsterEditor extends javax.swing.JFrame {
         return strQuestionRow;
     }
 
-    public void refreshTable() {
+    public final void refreshTable() {
         DefaultTableModel model = (DefaultTableModel) this.tblQuestion.getModel();
         model.setRowCount(0);
         this.monster.getQuestions().forEach(q -> model.addRow(questionToRow(q)));

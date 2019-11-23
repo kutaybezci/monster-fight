@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.IllegalFormatException;
 import java.util.Properties;
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -51,7 +52,7 @@ public class Translate {
         jlabel.setText(translate(jlabel.getText()));
     }
 
-    public void translate(JButton jbutton) {
+    public void translate(AbstractButton jbutton) {
         jbutton.setText(translate(jbutton.getText()));
     }
 
@@ -67,8 +68,8 @@ public class Translate {
         Utils.getAllComponents(jframe).forEach((c) -> {
             if(c instanceof JLabel){
                 translate((JLabel)c);
-            }else if(c instanceof JButton){
-                translate((JButton) c);
+            }else if(c instanceof AbstractButton){
+                translate((AbstractButton) c);
             }else if(c instanceof JTable){
                 translate((JTable) c);
             }

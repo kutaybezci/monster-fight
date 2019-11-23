@@ -7,7 +7,6 @@ import java.util.function.BiConsumer;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -199,7 +198,7 @@ public class FrmQuestionDisplay extends javax.swing.JFrame {
 
     public void setField(JTextComponent textField, String name, Question question, BiConsumer<Question, String> setter) {
         textField.requestFocus();
-        if (StringUtils.isBlank(textField.getText())) {
+        if (Utils.isBlank(textField.getText())) {
             throw new RuntimeException(String.format("%s boş!", name));
         }
         setter.accept(question, textField.getText());
@@ -208,7 +207,7 @@ public class FrmQuestionDisplay extends javax.swing.JFrame {
 
     public void setIntegerField(JTextField textField, String name, Question question, BiConsumer<Question, Integer> setter) {
         textField.requestFocus();
-        if (StringUtils.isBlank(textField.getText())) {
+        if (Utils.isBlank(textField.getText())) {
             throw new RuntimeException(String.format("%s boş!", name));
         }
         try {

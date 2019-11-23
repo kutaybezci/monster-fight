@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
 public class Session {
 
     private String playerName;
-    private boolean silent;
+    private boolean silent; 
 
     public String getPlayerName() {
         return this.playerName;

@@ -2,10 +2,10 @@ package com.kutaybezci.monsterFight.gui;
 
 import com.kutaybezci.monsterFight.FightingThread;
 import com.kutaybezci.monsterFight.Question;
+import com.kutaybezci.monsterFight.SoundPlayer;
 import com.kutaybezci.monsterFight.TimedFrame;
 import com.kutaybezci.monsterFight.Translate;
 import com.kutaybezci.monsterFight.Utils;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -33,6 +33,7 @@ public class FrmQuestion extends TimedFrame {
         this.jTextArea1.setText(this.question.getQuestion());
         this.jProgressBar1.setMinimum(0);
         this.jProgressBar1.setMaximum(this.getScreenTime());
+        this.setTitle(String.format("+%d -%d --%d", this.question.getBonus(), this.question.getPenalty(), this.question.getBleed()));
         this.startTimer();
     }
 
@@ -41,12 +42,12 @@ public class FrmQuestion extends TimedFrame {
             return;
         }
         answered=true;
-        if (StringUtils.equals(txtAnswer.getText(), question.getAnswer())) {
+        if (Utils.equals(txtAnswer.getText(), question.getAnswer())) {
             this.fightingThread.incrementMonsterHealth(-question.getBonus());
-            Utils.playSound("gold.wav");
+            SoundPlayer.GAIN.play();
         } else {
             this.fightingThread.incrementPlayerHealth(-question.getPenalty());
-            Utils.playSound("punch.wav");
+            SoundPlayer.HIT.play();
         }
         this.fightingThread.incrementActiveQuestionCount(-1);
         

@@ -13,7 +13,6 @@ import java.util.Random;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import lombok.Synchronized;
 
 /**
  *
@@ -28,7 +27,6 @@ public class FightingThread extends Thread {
     private volatile int activeQuestionCount;
     private final Queue<Question> questions;
     private final List<FrmQuestion> activeQuestion = new ArrayList<>();
-    //private long lastQuestionAsked;
 
     public FightingThread(FrmFight frmFight) {
         this.frmFight = frmFight;
@@ -54,18 +52,18 @@ public class FightingThread extends Thread {
             }
         }
         this.frmFight.paintHealth(this.monsterHealth, this.playerHealth, this.activeQuestionCount);
-        activeQuestion.forEach(t-> t.dispose());
+        activeQuestion.forEach(t -> t.dispose());
 
-        Translate translate=Translate.getInstance();
+        Translate translate = Translate.getInstance();
         if (this.playerHealth > this.monsterHealth) {
             Icon icon = new ImageIcon(getClass().getClassLoader().getResource("winner.png"));
-            String message=translate.translateFormat("msgVictory",this.monster.getName());
-            Utils.playSound("eloctro-win.wav");
+            String message = translate.translateFormat("msgVictory", this.monster.getSecretMessage());
+            SoundPlayer.WIN.play();
             JOptionPane.showMessageDialog(this.frmFight, message, translate.translate("titleVictory"), JOptionPane.ERROR_MESSAGE, icon);
         } else {
             Icon icon = new ImageIcon(getClass().getClassLoader().getResource("reaper.png"));
-            String message=translate.translateFormat("msgBeaten",this.monster.getSecretMessage());
-            Utils.playSound("evillaughter.wav");
+            String message = translate.translateFormat("msgBeaten", this.monster.getName());
+            SoundPlayer.LOST.play();
             JOptionPane.showMessageDialog(this.frmFight, message, translate.translate("titleBeaten"), JOptionPane.ERROR_MESSAGE, icon);
         }
     }
@@ -74,31 +72,23 @@ public class FightingThread extends Thread {
         return this.playerHealth > 0 && this.monsterHealth > 0 && questions.size() > 0;
     }
 
-    /*private boolean isMonsterReady() {
-        return (System.currentTimeMillis() - this.lastQuestionAsked) > (monster.getQuestionWaitSeconds() * 1000);
-    }*/
-
     private boolean isScreenReady() {
         return this.activeQuestionCount < this.monster.getMaxActiveQuestion();
     }
 
     private boolean canAsk() {
-        return /*isMonsterReady() &&*/ isScreenReady() && this.questions.size() > 0;
+        return isScreenReady() && this.questions.size() > 0;
     }
 
-    @Synchronized
-    public void incrementActiveQuestionCount(int i) {
-        System.out.println(String.format("A:%d %d", this.activeQuestionCount, i));
+    public synchronized void incrementActiveQuestionCount(int i) {
         this.activeQuestionCount += i;
     }
 
-    @Synchronized
-    public void incrementPlayerHealth(int i) {
+    public synchronized void incrementPlayerHealth(int i) {
         this.playerHealth += i;
     }
 
-    @Synchronized
-    public void incrementMonsterHealth(int i) {
+    public synchronized void incrementMonsterHealth(int i) {
         this.monsterHealth += i;
     }
 

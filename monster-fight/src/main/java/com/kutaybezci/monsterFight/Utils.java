@@ -2,6 +2,7 @@ package com.kutaybezci.monsterFight;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -10,7 +11,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -20,7 +20,7 @@ public class Utils {
 
     public static <T> void setField(JTextComponent textField, String name, T t, BiConsumer<T, String> setter) {
         textField.requestFocus();
-        if (StringUtils.isBlank(textField.getText())) {
+        if (isBlank(textField.getText())) {
             throw new RuntimeException(Translate.getInstance().translateFormat("errEmptyField", name));
         }
         setter.accept(t, textField.getText());
@@ -28,7 +28,7 @@ public class Utils {
 
     public static <T> void setIntegerField(JTextField textField, String name, T t, BiConsumer<T, Integer> setter) {
         textField.requestFocus();
-        if (StringUtils.isBlank(textField.getText())) {
+        if (isBlank(textField.getText())) {
             throw new RuntimeException(Translate.getInstance().translateFormat("errEmptyField", name));
         }
         try {
@@ -51,20 +51,33 @@ public class Utils {
         return compList;
     }
 
-    public static synchronized void playSound(String url) {
-        if(Session.getInstance().isSilent()){
+    /*public static void playSound(String url) {
+        if (Session.getInstance().isSilent()) {
             return;
         }
         new Thread(() -> {
             try {
                 Clip clip = AudioSystem.getClip();
                 AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-                        Utils.class.getResourceAsStream(url));
+                        Utils.class.getClassLoader().getResourceAsStream(url));
                 clip.open(inputStream);
                 clip.start();
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         ).start();
+    }*/
+
+    public static boolean equals(String s1, String s2) {
+        if (s1 == null || s2 == null) {
+            return false;
+        }
+        return s1.equals(s2);
+
+    }
+
+    public static boolean isBlank(String s1) {
+        return s1 == null || "".equals(s1.trim());
     }
 }
