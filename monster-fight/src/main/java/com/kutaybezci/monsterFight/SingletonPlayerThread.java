@@ -1,5 +1,7 @@
 package com.kutaybezci.monsterFight;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -48,10 +50,12 @@ public class SingletonPlayerThread extends Thread {
             try {
                 if (!this.playQueue.isEmpty()) {
                     GameSounds gameSounds = playQueue.poll();
-                    try (AudioInputStream inputStream = AudioSystem.getAudioInputStream(Utils.class.getClassLoader().getResourceAsStream(gameSounds.name));) {
-                        DataLine.Info info = new DataLine.Info(Clip.class, inputStream.getFormat());
+                    try (InputStream inputStream = Utils.class.getClassLoader().getResourceAsStream(gameSounds.name);
+                            InputStream bufferedInputStream = new BufferedInputStream(inputStream);
+                            AudioInputStream audioStream = AudioSystem.getAudioInputStream(bufferedInputStream)) {
+                        DataLine.Info info = new DataLine.Info(Clip.class, audioStream.getFormat());
                         Clip clip = (Clip) AudioSystem.getLine(info);
-                        clip.open(inputStream);
+                        clip.open(audioStream);
                         clip.start();
 
                     }
