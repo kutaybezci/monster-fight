@@ -40,9 +40,9 @@ public class FrmQuestionDisplay extends javax.swing.JFrame {
             this.btnDelete.setVisible(false);
         }
     }
-    
-    public void translate(){
-        Translate translate=Translate.getInstance();
+
+    public void translate() {
+        Translate translate = Translate.getInstance();
         translate.translate(this.btnDelete);
         translate.translate(this.btnSave);
         translate.translate(this.lblAnswer);
@@ -51,7 +51,7 @@ public class FrmQuestionDisplay extends javax.swing.JFrame {
         translate.translate(this.lblPenalty);
         translate.translate(this.lblQuestion);
         translate.translate(this.lblTime);
-        
+
     }
 
     /**
@@ -218,7 +218,6 @@ public class FrmQuestionDisplay extends javax.swing.JFrame {
         }
     }
 
-
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         Question question = new Question();
         try {
@@ -229,7 +228,7 @@ public class FrmQuestionDisplay extends javax.swing.JFrame {
             Utils.setIntegerField(this.txtPenalty, this.lblPenalty.getText(), question, Question::setPenalty);
             Utils.setIntegerField(this.txtBonus, this.lblBonus.getText(), question, Question::setBonus);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "HATA", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage());
             return;
         }
         if (this.index == -1) {
@@ -248,7 +247,7 @@ public class FrmQuestionDisplay extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {

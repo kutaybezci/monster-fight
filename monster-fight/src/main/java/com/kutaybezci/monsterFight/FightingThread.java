@@ -1,5 +1,6 @@
 package com.kutaybezci.monsterFight;
 
+import com.kutaybezci.monsterFight.SingletonPlayerThread.GameSounds;
 import com.kutaybezci.monsterFight.gui.FrmFight;
 import com.kutaybezci.monsterFight.gui.FrmQuestion;
 import java.awt.Dimension;
@@ -20,11 +21,16 @@ import javax.swing.JOptionPane;
  */
 public class FightingThread extends Thread {
 
+    public enum Status {
+        PREFIGHT, FIGHT, POSTFIGHT
+    }
+
     private final FrmFight frmFight;
     private final Monster monster;
     private volatile int playerHealth;
     private volatile int monsterHealth;
     private volatile int activeQuestionCount;
+    private volatile Status status;
     private final Queue<Question> questions;
     private final List<FrmQuestion> activeQuestion = new ArrayList<>();
 
@@ -36,11 +42,17 @@ public class FightingThread extends Thread {
         this.activeQuestionCount = 0;
         this.playerHealth = this.monster.getPlayerHealth();
         this.monsterHealth = this.monster.getHealth();
+        this.status = Status.PREFIGHT;
+    }
+
+    public Status getStatus() {
+        return this.status;
     }
 
     @Override
     public void run() {
         while (continueFighting()) {
+            this.status = Status.FIGHT;
             this.frmFight.paintHealth(this.monsterHealth, this.playerHealth, this.activeQuestionCount);
             if (canAsk()) {
                 ask();
@@ -51,6 +63,7 @@ public class FightingThread extends Thread {
                 ex.printStackTrace();
             }
         }
+        this.status = Status.POSTFIGHT;
         this.frmFight.paintHealth(this.monsterHealth, this.playerHealth, this.activeQuestionCount);
         activeQuestion.forEach(t -> t.dispose());
 
@@ -58,12 +71,12 @@ public class FightingThread extends Thread {
         if (this.playerHealth > this.monsterHealth) {
             Icon icon = new ImageIcon(getClass().getClassLoader().getResource("winner.png"));
             String message = translate.translateFormat("msgVictory", this.monster.getSecretMessage());
-            SoundPlayer.WIN.play();
+            SingletonPlayerThread.getInstance().play(GameSounds.WIN, true);
             JOptionPane.showMessageDialog(this.frmFight, message, translate.translate("titleVictory"), JOptionPane.ERROR_MESSAGE, icon);
         } else {
             Icon icon = new ImageIcon(getClass().getClassLoader().getResource("reaper.png"));
             String message = translate.translateFormat("msgBeaten", this.monster.getName());
-            SoundPlayer.LOST.play();
+            SingletonPlayerThread.getInstance().play(GameSounds.LOST, true);
             JOptionPane.showMessageDialog(this.frmFight, message, translate.translate("titleBeaten"), JOptionPane.ERROR_MESSAGE, icon);
         }
     }

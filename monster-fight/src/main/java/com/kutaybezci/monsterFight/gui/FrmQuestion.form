@@ -76,6 +76,9 @@
       </SubComponents>
     </Container>
     <Component class="javax.swing.JTextField" name="txtAnswer">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtAnswerActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnAnswer">
       <Properties>

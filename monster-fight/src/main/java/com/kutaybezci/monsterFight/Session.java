@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
 public class Session {
 
     private String playerName;
-    private boolean silent; 
+    private boolean silent = false;
 
     public String getPlayerName() {
         return this.playerName;
@@ -37,12 +37,8 @@ public class Session {
         Properties properties = new Properties();
         properties.setProperty("playerName", this.playerName);
         properties.setProperty("silent", String.valueOf(this.silent));
-        File file = new File("monster.config");
         try {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-
+            File file = Utils.getCurrentPath("monster.config", true);
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 properties.store(fos, "");
             }
@@ -53,22 +49,19 @@ public class Session {
     }
 
     private Session() {
+        this.playerName = Translate.getInstance().translate("default.name");
         Properties properties = new Properties();
-        File file = new File("monster.config");
         try {
-            if (!file.exists()) {
-                file.createNewFile();
-            } else {
-                try (FileInputStream fis = new FileInputStream(file)) {
-                    properties.load(fis);
-                    this.playerName = properties.getProperty("playerName", this.playerName);
-                    this.silent = Boolean.valueOf(properties.getProperty("silent", String.valueOf(this.silent)));
-                }
+            File file = Utils.getCurrentPath("monster.config", true);
+            try (FileInputStream fis = new FileInputStream(file)) {
+                properties.load(fis);
+                this.playerName = properties.getProperty("playerName", this.playerName);
+                this.silent = Boolean.valueOf(properties.getProperty("silent", String.valueOf(this.silent)));
             }
+
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }
-        this.playerName = Translate.getInstance().translate("default.name");
     }
 
     public static Session getInstance() {

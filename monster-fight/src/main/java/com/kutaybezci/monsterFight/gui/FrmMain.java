@@ -6,13 +6,13 @@ import com.kutaybezci.monsterFight.Translate;
 import com.kutaybezci.monsterFight.Utils;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -30,6 +30,7 @@ public class FrmMain extends javax.swing.JFrame {
      */
     public FrmMain() {
         initComponents();
+        btnHeroName.setText(Session.getInstance().getPlayerName());
         Translate.getInstance().translate(this);
     }
 
@@ -157,7 +158,7 @@ public class FrmMain extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEditMonsterActionPerformed
 
     private Monster chooseMonster() throws Exception {
-        JFileChooser fileChooser = new JFileChooser("monsters");
+        JFileChooser fileChooser = new JFileChooser(Utils.getCurrentPath("monsters", false));
         fileChooser.setDialogTitle(Translate.getInstance().translate("titleChooseMonster"));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
@@ -171,7 +172,6 @@ public class FrmMain extends javax.swing.JFrame {
         }
         return null;
     }
-
 
     private void btnHeroNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHeroNameActionPerformed
         Translate translate = Translate.getInstance();
@@ -213,6 +213,12 @@ public class FrmMain extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        Session.getInstance();
+        try {
+            Utils.getCurrentPath("monsters", false);
+        } catch (IOException ex) {
+            Logger.getLogger(FrmMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
         Translate translate = Translate.getInstance();
         UIManager.put("OptionPane.cancelButtonText", translate.translate("btnCancel"));
         UIManager.put("OptionPane.noButtonText", translate.translate("btnNo"));
@@ -221,7 +227,7 @@ public class FrmMain extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {

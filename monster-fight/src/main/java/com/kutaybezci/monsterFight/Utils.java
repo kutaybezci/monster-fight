@@ -3,12 +3,10 @@ package com.kutaybezci.monsterFight;
 import java.awt.Component;
 import java.awt.Container;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
@@ -68,7 +66,6 @@ public class Utils {
         }
         ).start();
     }*/
-
     public static boolean equals(String s1, String s2) {
         if (s1 == null || s2 == null) {
             return false;
@@ -80,4 +77,17 @@ public class Utils {
     public static boolean isBlank(String s1) {
         return s1 == null || "".equals(s1.trim());
     }
+
+    public static File getCurrentPath(String path, boolean fileTrueFolderFalse) throws IOException {
+        File file = new File(System.getProperty("user.dir"), path);
+        if (!file.exists()) {
+            if (fileTrueFolderFalse) {
+                file.createNewFile();
+            } else {
+                file.mkdir();
+            }
+        }
+        return file;
+    }
+
 }

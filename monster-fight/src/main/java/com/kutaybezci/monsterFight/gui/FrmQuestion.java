@@ -2,7 +2,8 @@ package com.kutaybezci.monsterFight.gui;
 
 import com.kutaybezci.monsterFight.FightingThread;
 import com.kutaybezci.monsterFight.Question;
-import com.kutaybezci.monsterFight.SoundPlayer;
+import com.kutaybezci.monsterFight.SingletonPlayerThread;
+import com.kutaybezci.monsterFight.SingletonPlayerThread.GameSounds;
 import com.kutaybezci.monsterFight.TimedFrame;
 import com.kutaybezci.monsterFight.Translate;
 import com.kutaybezci.monsterFight.Utils;
@@ -15,7 +16,7 @@ public class FrmQuestion extends TimedFrame {
 
     private final Question question;
     private final FightingThread fightingThread;
-    private boolean answered=false;
+    private boolean answered = false;
 
     /**
      * Creates new form QuestionFrm
@@ -38,19 +39,19 @@ public class FrmQuestion extends TimedFrame {
     }
 
     public void answer() {
-        if(answered){
+        if (answered || this.fightingThread.getStatus() != FightingThread.Status.FIGHT) {
             return;
         }
-        answered=true;
+        answered = true;
         if (Utils.equals(txtAnswer.getText(), question.getAnswer())) {
             this.fightingThread.incrementMonsterHealth(-question.getBonus());
-            SoundPlayer.GAIN.play();
+            SingletonPlayerThread.getInstance().play(GameSounds.GAIN, false);
         } else {
             this.fightingThread.incrementPlayerHealth(-question.getPenalty());
-            SoundPlayer.HIT.play();
+            SingletonPlayerThread.getInstance().play(GameSounds.HIT, false);
         }
         this.fightingThread.incrementActiveQuestionCount(-1);
-        
+
     }
 
     /**
@@ -74,6 +75,12 @@ public class FrmQuestion extends TimedFrame {
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
+
+        txtAnswer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtAnswerActionPerformed(evt);
+            }
+        });
 
         btnAnswer.setText("btnAnswer");
         btnAnswer.addActionListener(new java.awt.event.ActionListener() {
@@ -121,6 +128,11 @@ public class FrmQuestion extends TimedFrame {
         this.dispose();
     }//GEN-LAST:event_btnAnswerActionPerformed
 
+    private void txtAnswerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAnswerActionPerformed
+        answer();
+        this.dispose();
+    }//GEN-LAST:event_txtAnswerActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -128,7 +140,7 @@ public class FrmQuestion extends TimedFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
